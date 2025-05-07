@@ -50,7 +50,7 @@ class StoreController extends Controller
 
         $latitude = $validated['latitude'];
         $longitude = $validated['longitude'];
-        $radius = 40; // in kilometers
+        $radius = 50; // in kilometers
 
         $stores = Store::selectRaw("*, 
             (6371 * acos(
