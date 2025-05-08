@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\CityDataController;
+
+Route::get('/update-cities-from-stores', [CityDataController::class, 'updateMissingDistricts']);
 
 Route::get('/stores', [StoreController::class, 'index']);
 Route::post('/stores', [StoreController::class, 'store']);
