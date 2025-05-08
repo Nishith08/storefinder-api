@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
 
 class StoreController extends Controller
 {
@@ -19,6 +21,7 @@ class StoreController extends Controller
             'address' => 'nullable|string',
             'city' => 'nullable|string',
             'pincode' => 'nullable|string',
+            'district' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
@@ -68,4 +71,37 @@ class StoreController extends Controller
 
         return response()->json($stores);
     }
+
+    public function updateDistrictsFromPincode()
+    {
+        $stores = Store::where(function ($query) {
+            $query->whereNull('district')
+                  ->orWhere('district', '');
+        })
+        ->whereNotNull('pincode')
+        ->get();
+
+        foreach ($stores as $store) {
+            try {
+                $response = Http::get("https://api.postalpincode.in/pincode/{$store->pincode}");
+                $pinData = $response->json();
+
+                if (
+                    isset($pinData[0]['Status']) && $pinData[0]['Status'] === 'Success' &&
+                    isset($pinData[0]['PostOffice'][0]['District'])
+                ) {
+                    $store->district = $pinData[0]['PostOffice'][0]['District'];
+                    $store->save();
+                }
+            } catch (\Exception $e) {
+                \Log::warning("Failed to fetch district for pincode {$store->pincode}: " . $e->getMessage());
+            }
+        }
+
+        return response()->json([
+            'message' => 'Districts update finished',
+            'updated' => $stores->pluck('id') // or add more detailed debug info
+        ]);
+    }
+
 }
