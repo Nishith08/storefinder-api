@@ -7412,5 +7412,11 @@
         "state": "Karnataka",
         "latitude": 15.8572666,
         "longitude": 74.5069343
+    },
+    {
+        "district": "West Midnapore",
+        "state": "West Bengal",
+        "latitude": 22.0521107,
+        "longitude": 88.0712466
     }
 ]
